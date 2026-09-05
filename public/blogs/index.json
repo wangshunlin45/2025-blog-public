@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "slug": "9-5",
+    "title": "博客第一篇文章",
+    "tags": [
+      "Codex"
+    ],
+    "date": "2026-09-05T22:14",
+    "summary": "",
+    "cover": "/blogs/9-5/297a4659d9d864ca.png",
+    "hidden": false,
+    "category": ""
+  }
+]
