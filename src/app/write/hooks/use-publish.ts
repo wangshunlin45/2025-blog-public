@@ -18,7 +18,7 @@ export function usePublish() {
 		[setPrivateKey]
 	)
 
-	const onPublish = useCallback(async () => {
+	const onPublish = useCallback(async (): Promise<boolean> => {
 		try {
 			setLoading(true)
 			await pushBlog({
@@ -30,10 +30,12 @@ export function usePublish() {
 			})
 
 			const successMsg = mode === 'edit' ? '更新成功' : '发布成功'
-			toast.success(successMsg)
+			toast.success(`${successMsg}，已提交到仓库，稍等 1 分钟刷新即可看到。`)
+			return true
 		} catch (err: any) {
 			console.error(err)
 			toast.error(err?.message || '操作失败')
+			return false
 		} finally {
 			setLoading(false)
 		}

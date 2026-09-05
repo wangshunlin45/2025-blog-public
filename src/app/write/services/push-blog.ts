@@ -25,7 +25,7 @@ export type PushBlogParams = {
 	originalSlug?: string | null
 }
 
-export async function pushBlog(params: PushBlogParams): Promise<void> {
+async function pushBlogOnce(params: PushBlogParams): Promise<void> {
 	const { form, cover, images, mode = 'create', originalSlug } = params
 
 	if (!form?.slug) throw new Error('需要 slug')
@@ -176,4 +176,27 @@ export async function pushBlog(params: PushBlogParams): Promise<void> {
 	await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`, commitData.sha)
 
 	toast.success('发布成功！')
+}
+
+function isRetryableError(err: unknown): boolean {
+	const message = err instanceof Error ? err.message : String(err)
+	return /(: 401|: 403|: 409|: 422|: 429|: 5\d\d|fetch failed|failed to fetch|network|timed out|timeout|abort)/i.test(message)
+}
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+export async function pushBlog(params: PushBlogParams): Promise<void> {
+	let lastError: unknown
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		try {
+			await pushBlogOnce(params)
+			return
+		} catch (err) {
+			lastError = err
+			if (attempt === 3 || !isRetryableError(err)) throw err
+			toast.info(`提交遇到临时问题，正在自动重试（${attempt}/3）...`)
+			await wait(1500 * attempt)
+		}
+	}
+	throw lastError
 }

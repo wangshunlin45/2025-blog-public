@@ -8,11 +8,14 @@ import { CARD_SPACING } from '@/consts'
 import MusicSVG from '@/svgs/music.svg'
 import PlaySVG from '@/svgs/play.svg'
 import { HomeDraggableLayer } from '../app/(home)/home-draggable-layer'
-import { Pause } from 'lucide-react'
+import { Pause, SkipBack, SkipForward } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 
-const MUSIC_FILES = ['/music/close-to-you.mp3']
+const SONGS = [
+	{ name: 'Close To You', src: '/music/close-to-you.mp3' },
+	{ name: 'Christmas', src: '/music/christmas.m4a' }
+]
 
 export default function MusicCard() {
 	const pathname = usePathname()
@@ -64,7 +67,7 @@ export default function MusicCard() {
 		}
 
 		const handleEnded = () => {
-			const nextIndex = (currentIndexRef.current + 1) % MUSIC_FILES.length
+			const nextIndex = (currentIndexRef.current + 1) % SONGS.length
 			currentIndexRef.current = nextIndex
 			setCurrentIndex(nextIndex)
 			setProgress(0)
@@ -95,7 +98,7 @@ export default function MusicCard() {
 		if (audioRef.current) {
 			const wasPlaying = !audioRef.current.paused
 			audioRef.current.pause()
-			audioRef.current.src = MUSIC_FILES[currentIndex]
+			audioRef.current.src = SONGS[currentIndex].src
 			audioRef.current.loop = false
 			setProgress(0)
 
@@ -130,6 +133,10 @@ export default function MusicCard() {
 		setIsPlaying(!isPlaying)
 	}
 
+	const skip = (delta: number) => {
+		setCurrentIndex(index => (index + delta + SONGS.length) % SONGS.length)
+	}
+
 	// Hide component if not on home page and not playing
 	if (!isHomePage && !isPlaying) {
 		return null
@@ -158,15 +165,31 @@ export default function MusicCard() {
 				<MusicSVG className='h-8 w-8' />
 
 				<div className='flex-1'>
-					<div className='text-secondary text-sm'>Close To You</div>
+					<select
+						aria-label='选择音乐'
+						value={currentIndex}
+						onChange={e => setCurrentIndex(Number(e.target.value))}
+						className='text-secondary w-full cursor-pointer bg-transparent text-sm outline-none'>
+						{SONGS.map((song, index) => (
+							<option key={song.src} value={index}>
+								{song.name}
+							</option>
+						))}
+					</select>
 
 					<div className='mt-1 h-2 rounded-full bg-white/60'>
 						<div className='bg-linear h-full rounded-full transition-all duration-300' style={{ width: `${progress}%` }} />
 					</div>
 				</div>
 
+				<button onClick={() => skip(-1)} aria-label='上一首' className='text-secondary hover:text-brand flex h-8 w-8 items-center justify-center rounded-full transition-colors'>
+					<SkipBack size={15} />
+				</button>
 				<button onClick={togglePlayPause} className='flex h-10 w-10 items-center justify-center rounded-full bg-white transition-opacity hover:opacity-80'>
 					{isPlaying ? <Pause className='text-brand h-4 w-4' /> : <PlaySVG className='text-brand ml-1 h-4 w-4' />}
+				</button>
+				<button onClick={() => skip(1)} aria-label='下一首' className='text-secondary hover:text-brand flex h-8 w-8 items-center justify-center rounded-full transition-colors'>
+					<SkipForward size={15} />
 				</button>
 			</Card>
 		</HomeDraggableLayer>

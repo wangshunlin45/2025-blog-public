@@ -7,7 +7,7 @@ import { usePreviewStore } from '../stores/preview-store'
 import { usePublish } from '../hooks/use-publish'
 
 export function WriteActions() {
-	const { loading, mode, form, loadBlogForEdit, originalSlug, updateForm } = useWriteStore()
+	const { loading, mode, form, originalSlug, updateForm, reset } = useWriteStore()
 	const { openPreview } = usePreviewStore()
 	const { isAuth, onChoosePrivateKey, onPublish, onDelete } = usePublish()
 	const [saving, setSaving] = useState(false)
@@ -15,11 +15,17 @@ export function WriteActions() {
 	const mdInputRef = useRef<HTMLInputElement>(null)
 	const router = useRouter()
 
-	const handleImportOrPublish = () => {
+	const handleImportOrPublish = async () => {
 		if (!isAuth) {
 			keyInputRef.current?.click()
+			return
+		}
+		const published = await onPublish()
+		if (published) {
+			reset()
+			router.push('/blog')
 		} else {
-			onPublish()
+			toast.info('发布未完成，编辑器内容已保留，可直接再试一次')
 		}
 	}
 

@@ -5,21 +5,28 @@ import { toast } from 'sonner'
 import { decrypt,encrypt } from './aes256-util'
 
 const GITHUB_TOKEN_CACHE_KEY = 'github_token'
+const GITHUB_TOKEN_EXPIRES_KEY = 'github_token_expires'
 const GITHUB_PEM_CACHE_KEY = 'p_info'
 
 function getTokenFromCache(): string | null {
 	if (typeof sessionStorage === 'undefined') return null
 	try {
-		return sessionStorage.getItem(GITHUB_TOKEN_CACHE_KEY)
+		const token = sessionStorage.getItem(GITHUB_TOKEN_CACHE_KEY)
+		if (!token) return null
+		const expiresAt = sessionStorage.getItem(GITHUB_TOKEN_EXPIRES_KEY)
+		if (expiresAt && Date.now() + 60_000 >= new Date(expiresAt).getTime()) return null
+		return token
 	} catch {
 		return null
 	}
 }
 
-function saveTokenToCache(token: string): void {
+function saveTokenToCache(token: string, expiresAt?: string): void {
 	if (typeof sessionStorage === 'undefined') return
 	try {
 		sessionStorage.setItem(GITHUB_TOKEN_CACHE_KEY, token)
+		if (expiresAt) sessionStorage.setItem(GITHUB_TOKEN_EXPIRES_KEY, expiresAt)
+		else sessionStorage.removeItem(GITHUB_TOKEN_EXPIRES_KEY)
 	} catch (error) {
 		console.error('Failed to save token to cache:', error)
 	}
@@ -29,6 +36,7 @@ function clearTokenCache(): void {
 	if (typeof sessionStorage === 'undefined') return
 	try {
 		sessionStorage.removeItem(GITHUB_TOKEN_CACHE_KEY)
+		sessionStorage.removeItem(GITHUB_TOKEN_EXPIRES_KEY)
 	} catch (error) {
 		console.error('Failed to clear token cache:', error)
 	}
@@ -101,9 +109,9 @@ export async function getAuthToken(): Promise<string> {
 	const installationId = await getInstallationId(jwt, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO)
 
 	toast.info('正在创建安装令牌...')
-	const token = await createInstallationToken(jwt, installationId)
+	const { token, expires_at } = await createInstallationToken(jwt, installationId)
 
-	saveTokenToCache(token)
+	saveTokenToCache(token, expires_at)
 
 	return token
 }
