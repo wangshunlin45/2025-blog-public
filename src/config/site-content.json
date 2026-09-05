@@ -35,9 +35,16 @@
 			"value": "https://github.com/wangshunlin45",
 			"label": "Github",
 			"order": 1
+		},
+		{
+			"id": "button-1788607817272",
+			"type": "link",
+			"value": "https://monitor.xinfeng.asia",
+			"label": "站点监测",
+			"order": 2
 		}
 	],
-	"clockShowSeconds": false,
+	"clockShowSeconds": true,
 	"summaryInContent": false,
 	"isCachePem": false,
 	"hideEditButton": false,
