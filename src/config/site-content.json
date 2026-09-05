@@ -30,18 +30,25 @@
 	"currentBackgroundImageId": "",
 	"socialButtons": [
 		{
-			"id": "github",
-			"type": "github",
-			"value": "https://github.com/wangshunlin45",
-			"label": "Github",
-			"order": 1
-		},
-		{
 			"id": "button-1788607817272",
 			"type": "link",
 			"value": "https://monitor.xinfeng.asia/",
 			"label": "站点监测",
+			"order": 1
+		},
+		{
+			"id": "github",
+			"type": "github",
+			"value": "https://github.com/wangshunlin45",
+			"label": "Github",
 			"order": 2
+		},
+		{
+			"id": "button-1788623809910",
+			"type": "link",
+			"value": "",
+			"label": "",
+			"order": 3
 		}
 	],
 	"clockShowSeconds": true,
