@@ -219,7 +219,7 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 		onClose()
 	}
 
-	const buttonText = isAuth ? '保存' : '导入密钥后保存'
+	const buttonText = isAuth ? '保存' : '导入密钥'
 
 	const tabs: { id: TabType; label: string }[] = [
 		{ id: 'site', label: '网站设置' },
@@ -241,13 +241,8 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 				}}
 			/>
 
-			<DialogModal
-				open={open}
-				onClose={handleCancel}
-				className='card scrollbar-none max-h-[90vh] min-h-[min(600px,90vh)] w-[min(640px,94vw)] max-sm:min-h-0 overflow-y-auto'>
-				<div
-					className='sticky top-0 z-10 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-t-[inherit] border-b border-white/40 pb-3 backdrop-blur-xl'
-					style={{ background: 'var(--color-card)' }}>
+			<DialogModal open={open} onClose={handleCancel} className='card scrollbar-none max-h-[90vh] min-h-[600px] w-[640px] overflow-y-auto'>
+				<div className='mb-6 flex items-center justify-between'>
 					<div className='flex gap-1'>
 						{tabs.map(tab => (
 							<button
@@ -302,29 +297,6 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 					)}
 					{activeTab === 'color' && <ColorConfig formData={formData} setFormData={setFormData} />}
 					{activeTab === 'layout' && <HomeLayout cardStylesData={cardStylesData} setCardStylesData={setCardStylesData} onClose={onClose} />}
-				</div>
-
-				<div
-					className='sticky bottom-0 z-10 mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/40 pt-4 backdrop-blur-xl'
-					style={{ background: 'var(--color-card)' }}>
-					<span className='text-secondary text-xs leading-relaxed'>
-						{isAuth
-							? '点“保存”会提交到你的 GitHub 仓库并自动触发部署，稍等 1 分钟刷新即可看到。'
-							: '首次保存会弹出文件选择框，请选择下载好的私钥 .pem 文件，导入后会自动保存。'}
-					</span>
-					<div className='flex items-center gap-3'>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleCancel}
-							disabled={isSaving}
-							className='bg-card rounded-xl border px-6 py-2 text-sm'>
-							取消
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
-							{isSaving ? '保存中...' : buttonText}
-						</motion.button>
-					</div>
 				</div>
 			</DialogModal>
 		</>

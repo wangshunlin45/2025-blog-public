@@ -3,7 +3,6 @@ import PenSVG from '@/svgs/pen.svg'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useConfigStore } from './stores/config-store'
-import { useAuthStore } from '@/hooks/use-auth'
 import { useCenterStore } from '@/hooks/use-center'
 import { useRouter } from 'next/navigation'
 import { useSize } from '@/hooks/use-size'
@@ -13,7 +12,6 @@ import { HomeDraggableLayer } from './home-draggable-layer'
 export default function WriteButton() {
 	const center = useCenterStore()
 	const { cardStyles, setConfigDialogOpen, siteContent } = useConfigStore()
-	const { isAuth } = useAuthStore()
 	const { maxSM } = useSize()
 	const router = useRouter()
 	const styles = cardStyles.writeButtons
@@ -27,8 +25,6 @@ export default function WriteButton() {
 	}, [styles.order])
 
 	if (maxSM) return null
-
-	if (siteContent.hideEditButton && !isAuth) return null
 
 	if (!show) return null
 
